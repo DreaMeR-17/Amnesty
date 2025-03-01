@@ -8,35 +8,52 @@ namespace Amnesty
     {
         static void Main(string[] args)
         {
-            Database dataBase = new Database();
-            dataBase.Work();
+            Database database = new Database();
+            database.Work();
         }
     }
 
     class Crime
     {
-        private List<string> _crimes = new List<string>
-        {
-            "Murder",
-            "Assault",
-            "Robbery",
-            "AntiGovernment",
-            "Theft",
-            "Homicide",
-            "Rape",
-            "Vandalism",
-            "Fraud"
-        };
+        public string Name { get; }
 
-        public string GetRandom() => _crimes[UserUtils.GetNumber(_crimes.Count)];
+        public Crime(string name)
+        {
+            Name = name;
+        }
+    }
+
+    class CrimeRepository
+    {
+        private List<Crime> _crimes;
+
+        public CrimeRepository()
+        {
+            _crimes = new List<Crime>
+            {
+                new Crime("Murder"),
+                new Crime("Assault"),
+                new Crime("Robbery"),
+                new Crime("AntiGovernment"),
+                new Crime("Theft"),
+                new Crime("Homicide"),
+                new Crime("Rape"),
+                new Crime("Vandalism"),
+                new Crime("Fraud")
+            };
+        }
+
+        public Crime GetRandomCrime() => _crimes[UserUtils.GetNumber(_crimes.Count)];
     }
 
     class Database
     {
         private List<Prisoner> _prisoners;
+        private CrimeRepository _crimeRepository;
 
         public Database()
         {
+            _crimeRepository = new CrimeRepository();
             Fill();
         }
 
@@ -63,11 +80,8 @@ namespace Amnesty
         {
             string crimeType = "AntiGovernment";
 
-            var remainingList = _prisoners.Where(prisoner => prisoner.Crime != crimeType).ToList();
-
-            var amnestiedList = _prisoners.Where(prisoner => prisoner.Crime == crimeType).ToList();
-
-            _prisoners = remainingList;
+            var amnestiedList = _prisoners.Where(prisoner => prisoner.Crime.Name == crimeType).ToList();
+            _prisoners.RemoveAll(prisoner => prisoner.Crime.Name == crimeType);
 
             Console.WriteLine("\nПопавшие под амнистию: \n");
             ShowList(amnestiedList);
@@ -75,61 +89,40 @@ namespace Amnesty
 
         private void Fill()
         {
-            _prisoners = new List<Prisoner>()
-                {
-                    new Prisoner("Davidoff"),
-                    new Prisoner("Marco"),
-                    new Prisoner("Michael"),
-                    new Prisoner("Garcia"),
-                    new Prisoner("Janette"),
-                    new Prisoner("Nate"),
-                    new Prisoner("Nah"),
-                    new Prisoner("Lusi"),
-                    new Prisoner("Leam"),
-                    new Prisoner("Luca"),
-                    new Prisoner("Miller"),
-                    new Prisoner("Negan"),
-                    new Prisoner("Silco"),
-                    new Prisoner("Sevika"),
-                    new Prisoner("Vander"),
-                    new Prisoner("Jinx"),
-                    new Prisoner("Vi"),
+            List<string> names = new List<string>
+            {
+                "Davidoff", "Marco", "Michael", "Garcia", "Janette",
+                "Nate", "Nah", "Lusi", "Leam", "Luca",
+                "Miller", "Negan", "Silco", "Sevika", "Vander",
+                "Jinx", "Vi"
+            };
 
-                };
+            _prisoners = names.Select(name => new Prisoner(name, _crimeRepository.GetRandomCrime())).ToList();
         }
     }
 
     class Prisoner
     {
-        public Prisoner(string name)
+        public string Name { get; private set; }
+        public Crime Crime { get; private set; }
+
+        public Prisoner(string name, Crime crime)
         {
             Name = name;
-            Crime = GetRandomCrime();
+            Crime = crime;
         }
-
-        public string Name { get; private set; }
-
-        public string Crime { get; private set; }
 
         public void ShowInfo()
         {
-            Console.WriteLine($"Имя - {Name}. Преступление: {Crime}.");
-        }
-
-        private string GetRandomCrime()
-        {
-            Crime crimes = new Crime();
-            return crimes.GetRandom();
+            Console.WriteLine($"Имя - {Name}. Преступление: {Crime.Name}.");
         }
     }
 
     static class UserUtils
     {
         private static Random s_random = new Random();
-        private static bool[] s_bools = new bool[] { true, false };
 
         public static int GetNumber(int maxValue) => s_random.Next(maxValue);
-
-        public static int GetNumber(int minValue, int maxValue) => s_random.Next(minValue, maxValue);
     }
 }
+
