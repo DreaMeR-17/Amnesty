@@ -49,11 +49,11 @@ namespace Amnesty
     class Database
     {
         private List<Prisoner> _prisoners;
-        private CrimeRepository _crimeRepo;
+        private CrimeRepository _crimeRepository;
 
         public Database()
         {
-            _crimeRepo = new CrimeRepository();
+            _crimeRepository = new CrimeRepository();
             Fill();
         }
 
@@ -97,7 +97,7 @@ namespace Amnesty
                 "Jinx", "Vi"
             };
 
-            _prisoners = names.Select(name => new Prisoner(name, _crimeRepo.GetRandomCrime())).ToList();
+            _prisoners = names.Select(name => new Prisoner(name, _crimeRepository.GetRandomCrime())).ToList();
         }
     }
 
