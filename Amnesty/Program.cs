@@ -8,19 +8,19 @@ namespace Amnesty
     {
         static void Main(string[] args)
         {
-            Database database = new Database();
-            database.Work();
+            Database dataBase = new Database();
+            dataBase.Work();
         }
     }
 
     class Crime
     {
-        public string Name { get; }
-
         public Crime(string name)
         {
             Name = name;
         }
+
+        public string Name { get; }
     }
 
     class CrimeRepository
@@ -49,11 +49,11 @@ namespace Amnesty
     class Database
     {
         private List<Prisoner> _prisoners;
-        private CrimeRepository _crimeRepository;
+        private CrimeRepository _crimeRepo;
 
         public Database()
         {
-            _crimeRepository = new CrimeRepository();
+            _crimeRepo = new CrimeRepository();
             Fill();
         }
 
@@ -81,7 +81,7 @@ namespace Amnesty
             string crimeType = "AntiGovernment";
 
             var amnestiedList = _prisoners.Where(prisoner => prisoner.Crime.Name == crimeType).ToList();
-            _prisoners.RemoveAll(prisoner => prisoner.Crime.Name == crimeType);
+            _prisoners = _prisoners.Where(prisoner => prisoner.Crime.Name != crimeType).ToList();
 
             Console.WriteLine("\nПопавшие под амнистию: \n");
             ShowList(amnestiedList);
@@ -97,20 +97,20 @@ namespace Amnesty
                 "Jinx", "Vi"
             };
 
-            _prisoners = names.Select(name => new Prisoner(name, _crimeRepository.GetRandomCrime())).ToList();
+            _prisoners = names.Select(name => new Prisoner(name, _crimeRepo.GetRandomCrime())).ToList();
         }
     }
 
     class Prisoner
     {
-        public string Name { get; private set; }
-        public Crime Crime { get; private set; }
-
         public Prisoner(string name, Crime crime)
         {
             Name = name;
             Crime = crime;
         }
+
+        public string Name { get; }
+        public Crime Crime { get; }
 
         public void ShowInfo()
         {
@@ -126,4 +126,5 @@ namespace Amnesty
                           s_random.Next(maxValue);
     }
 }
+
 
