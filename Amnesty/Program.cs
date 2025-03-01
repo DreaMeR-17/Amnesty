@@ -122,7 +122,8 @@ namespace Amnesty
     {
         private static Random s_random = new Random();
 
-        public static int GetNumber(int maxValue) => s_random.Next(maxValue);
+        public static int GetNumber(int maxValue) => 
+                          s_random.Next(maxValue);
     }
 }
 
